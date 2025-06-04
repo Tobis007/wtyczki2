@@ -1,39 +1,28 @@
-name: PHP Composer
+name: PHP Workflow
 
 on:
   push:
-    branches: [ "moje_pliki" ]
+    branches: [moje_pliki]
   pull_request:
-    branches: [ "moje_pliki" ]
-
-permissions:
-  contents: read
+    branches: [moje_pliki]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
       with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
+        php-version: '8.2'
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+    - name: Sprawdź wersję PHP
+      run: php -v
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
-
-    # - name: Run test suite
-    #   run: composer run-script test
+    - name: (opcjonalnie) Uruchom plik PHP
+      run: |
+        echo "<?php echo 'Działa PHP!';" > test.php
+        php test.php
